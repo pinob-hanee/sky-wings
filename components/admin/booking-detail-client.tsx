@@ -13,10 +13,19 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, AlertCircle, Calendar, User, Plane, Clock, ArrowLeft, Ban, Edit, Send, FileText } from "lucide-react"
 import { PassengerEditForm } from "@/components/admin/passenger-edit-form"
+import { toast } from "@/components/ui/toast"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export default function BookingDetailClient({ bookingReference, initialBooking = null, error: initialError = null }) {
+export default function BookingDetailClient({
+  bookingReference,
+  initialBooking = null, 
+  error: initialError = null 
+}: {
+  bookingReference: string;
+  initialBooking: any;
+  error: string | null;
+}) {
   const router = useRouter()
   
   const [booking, setBooking] = useState(initialBooking)
@@ -54,14 +63,6 @@ export default function BookingDetailClient({ bookingReference, initialBooking =
     }
   }, [bookingReference, initialBooking, initialError])
   
-  const showToast = (options) => {
-    // Create and dispatch a custom event for the toast
-    const event = new CustomEvent("toast", { 
-      detail: options
-    });
-    window.dispatchEvent(event);
-  };
-  
   const handleCancelBooking = async () => {
     try {
       setIsCancelling(true)
@@ -85,24 +86,21 @@ export default function BookingDetailClient({ bookingReference, initialBooking =
       setCancellationReason("")
       setDialogOpen(false)
       
-      showToast({
-        title: "Booking Cancelled",
-        description: "The booking has been successfully cancelled."
-      })
-    } catch (err) {
+      alert("Booking cancelled successfully");
+      
+      window.location.reload();
+    } catch (err: unknown) {
       console.error("Cancel booking error:", err)
-      setError(err.message || "Failed to cancel booking")
-      showToast({
-        variant: "destructive",
-        title: "Error",
-        description: err.message || "Failed to cancel booking. Please try again."
-      })
+      const errorMessage = err instanceof Error ? err.message : "Failed to cancel booking"
+      setError(errorMessage)
+      
+      alert(`Error: ${errorMessage}`);
     } finally {
       setIsCancelling(false)
     }
   }
   
-  const handlePassengerUpdate = async (updatedPassengers) => {
+  const handlePassengerUpdate = async (updatedPassengers: any[]) => {
     try {
       setLoading(true)
       setError(null)
@@ -124,17 +122,21 @@ export default function BookingDetailClient({ bookingReference, initialBooking =
       setBooking(data.booking)
       setDialogOpen(false)
       
-      showToast({
+      toast({
         title: "Passenger Updated",
-        description: "Passenger details have been successfully updated."
+        description: "Passenger details have been successfully updated.",
+        variant: "default",
+        duration: 3000
       })
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Update passenger error:", err)
-      setError(err.message || "Failed to update passenger details")
-      showToast({
+      const errorMessage = err instanceof Error ? err.message : "Failed to update passenger details"
+      setError(errorMessage)
+      toast({
         variant: "destructive",
         title: "Error",
-        description: err.message || "Failed to update passenger details. Please try again."
+        description: err.message || "Failed to update passenger details. Please try again.",
+        duration: 3000
       })
     } finally {
       setLoading(false)
@@ -152,17 +154,20 @@ export default function BookingDetailClient({ bookingReference, initialBooking =
       if (!response.ok) {
         throw new Error('Failed to resend email')
       }
-      
       const data = await response.json()
-      showToast({
+      toast({
         title: "Email Sent",
-        description: `Confirmation email has been sent to ${data.sentTo}`
+        description: `Confirmation email has been sent to ${data.sentTo}`,
+        variant: "default",
+        duration: 3000
       })
     } catch (err) {
-      showToast({
-        variant: "destructive",
+      toast({
+        variant: "destructive", 
         title: "Error",
-        description: "Failed to resend confirmation email. Please try again."
+        description: "Failed to resend confirmation email. Please try again.",
+        duration: 3000
+
       })
     } finally {
       setIsResendingEmail(false)

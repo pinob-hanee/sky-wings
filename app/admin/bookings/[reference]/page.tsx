@@ -13,8 +13,8 @@ export function generateStaticParams() {
   ]
 }
 
-export default function BookingDetailPage({ params }) {
-  const bookingReference = params.reference as string
+export default function BookingDetailPage({ params }: { params: { reference: string } }) {
+  const bookingReference = params.reference
   
   return (
     <Suspense fallback={
@@ -25,7 +25,7 @@ export default function BookingDetailPage({ params }) {
         </div>
       </div>
     }>
-      <BookingDetailClient bookingReference={bookingReference} />
+      <BookingDetailClient bookingReference={bookingReference} initialBooking={undefined} error={null} />
     </Suspense>
   )
 } 

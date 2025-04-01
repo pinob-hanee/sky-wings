@@ -45,7 +45,7 @@ export default function AdminPage() {
               <CardHeader>
                 <CardTitle>Find Booking</CardTitle>
                 <CardDescription>
-                  Enter a booking reference to find and manage a customer's booking
+                  Enter a booking reference to find and manage a Customer booking
                 </CardDescription>
               </CardHeader>
               <CardContent>
