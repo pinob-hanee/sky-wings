@@ -29,7 +29,7 @@ const passengerSchema = z.object({
   })
 });
 
-export function PassengerForm({ onSubmit, passengerCount = 1 }) {
+export function PassengerForm({ onSubmit }: { onSubmit: (passengers: any[]) => void }, passengerCount = 1) {
   const [passengers, setPassengers] = useState(Array(passengerCount).fill(null).map(() => ({
     firstName: "",
     lastName: "",
@@ -40,9 +40,9 @@ export function PassengerForm({ onSubmit, passengerCount = 1 }) {
   })));
   
   const [currentPassenger, setCurrentPassenger] = useState(0);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState<string[][]>([]);
   
-  const handleInputChange = (index, field, value) => {
+  const handleInputChange = (index: number, field: string, value: string | Date) => {
     const updatedPassengers = [...passengers];
     updatedPassengers[index] = {
       ...updatedPassengers[index],
@@ -51,26 +51,35 @@ export function PassengerForm({ onSubmit, passengerCount = 1 }) {
     setPassengers(updatedPassengers);
   };
   
-  const validatePassenger = (passenger, index) => {
+  const validatePassenger = (passenger: z.infer<typeof passengerSchema>, index: number) => {
     try {
       passengerSchema.parse(passenger);
       return true;
     } catch (error) {
       setErrors(prev => {
         const newErrors = [...prev];
-        newErrors[index] = error.errors.map(e => e.message);
+        newErrors[index] = (error as z.ZodError).errors.map(e => e.message);
         return newErrors;
       });
       return false;
     }
   };
-  
   const handleNext = () => {
-    if (validatePassenger(passengers[currentPassenger], currentPassenger)) {
+    const currentPassengerData = {
+      ...passengers[currentPassenger],
+      gender: passengers[currentPassenger].gender === "unspecified" ? "other" : passengers[currentPassenger].gender,
+      dateOfBirth: passengers[currentPassenger].dateOfBirth || new Date()
+    } as { firstName: string; lastName: string; email: string; phone: string; gender: "male" | "female" | "other"; dateOfBirth: Date };
+
+    if (validatePassenger(currentPassengerData, currentPassenger)) {
       if (currentPassenger < passengers.length - 1) {
         setCurrentPassenger(currentPassenger + 1);
       } else {
-        onSubmit(passengers);
+        onSubmit(passengers.map(p => ({
+          ...p,
+          gender: p.gender === "unspecified" ? "other" : p.gender,
+          dateOfBirth: p.dateOfBirth || new Date()
+        })));
       }
     }
   };
@@ -92,7 +101,7 @@ export function PassengerForm({ onSubmit, passengerCount = 1 }) {
     }]);
   };
   
-  const handleRemovePassenger = (index) => {
+  const handleRemovePassenger = (index: number) => {
     if (passengers.length > 1) {
       const updatedPassengers = passengers.filter((_, i) => i !== index);
       setPassengers(updatedPassengers);
@@ -143,7 +152,7 @@ export function PassengerForm({ onSubmit, passengerCount = 1 }) {
       <Card>
         <CardHeader>
           <CardTitle>Personal Information</CardTitle>
-          <CardDescription>Enter the passenger's personal details</CardDescription>
+          <CardDescription>Enter the passenger&apos;s personal details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

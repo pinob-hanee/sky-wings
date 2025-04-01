@@ -135,7 +135,7 @@ export default function BookingDetailClient({
       toast({
         variant: "destructive",
         title: "Error",
-        description: err.message || "Failed to update passenger details. Please try again.",
+        description: errorMessage,
         duration: 3000
       })
     } finally {
@@ -338,7 +338,12 @@ export default function BookingDetailClient({
                 <CardDescription>Details of all passengers on this booking</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {booking.passengers.map((passenger, index) => (
+                {booking.passengers.map((passenger: {
+                  firstName: string;
+                  lastName: string;
+                  email?: string;
+                  phone?: string;
+                }, index: number) => (
                   <div key={index} className="border p-4 rounded-lg">
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -364,7 +369,11 @@ export default function BookingDetailClient({
                             </DialogDescription>
                           </DialogHeader>
                           <PassengerEditForm 
-                            passenger={passenger} 
+                            passenger={{
+                              ...passenger,
+                              gender: "UNKNOWN",
+                              dateOfBirth: new Date()
+                            }}
                             index={index}
                             onSave={(updatedPassenger) => {
                               const updatedPassengers = [...booking.passengers];

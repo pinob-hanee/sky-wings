@@ -10,15 +10,15 @@ import { Loader2 } from "lucide-react"
 
 interface PassengerEditFormProps {
   passenger: {
-    firstName: string
-    lastName: string
-    email?: string
-    phone?: string
-    gender?: string
-    dateOfBirth?: string
-  }
-  index: number
-  onSave: (updatedPassenger: any) => void
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    gender: string;
+    dateOfBirth: string | Date;
+  };
+  index: number;
+  onSave: (data: any) => void;
 }
 
 export function PassengerEditForm({ passenger, index, onSave }: PassengerEditFormProps) {
@@ -32,7 +32,7 @@ export function PassengerEditForm({ passenger, index, onSave }: PassengerEditFor
   })
   const [loading, setLoading] = useState(false)
   
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -40,14 +40,14 @@ export function PassengerEditForm({ passenger, index, onSave }: PassengerEditFor
     }))
   }
   
-  const handleSelectChange = (name, value) => {
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
     }))
   }
   
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     
@@ -134,7 +134,7 @@ export function PassengerEditForm({ passenger, index, onSave }: PassengerEditFor
               id="dateOfBirth"
               name="dateOfBirth"
               type="date"
-              value={formData.dateOfBirth}
+              value={formData.dateOfBirth instanceof Date ? formData.dateOfBirth.toISOString().split('T')[0] : formData.dateOfBirth}
               onChange={handleInputChange}
             />
           </div>

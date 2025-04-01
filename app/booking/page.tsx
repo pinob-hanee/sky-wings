@@ -1,7 +1,7 @@
 // app/booking/page.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, SetStateAction } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Loader2, AlertCircle, User, CreditCard, Check, Plane } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -16,7 +16,7 @@ import { PaymentForm } from "@/components/payment-form"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 // Helper function to format duration
-const formatDuration = (duration) => {
+const formatDuration = (duration: string) => {
   // ISO8601 duration format: PT2H30M
   const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
   if (!match) return duration;
@@ -43,7 +43,7 @@ export default function BookingPage() {
   useEffect(() => {
     const fetchFlightDetails = async () => {
       if (!flightId) {
-        setError("No flight selected");
+        setError("Failed to fetch flight details");
         setLoading(false);
         return;
       }
